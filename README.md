@@ -8,3 +8,6 @@ spring boot quartz整合项目，没啥特定的好处，就是下载下来就�
 …… 
 先想到这里吧，如果有缘人看到了，有什么好的想法也可以反馈给我，我抽时间加上去 
 联系我的邮箱是这个：pangqibao@foxmail.com
+
+对了，里面用到的数据库SQL就是quartz里面的，如果你难得找，可以直接赋值这个地址里面的
+https://github.com/pangqibao/springboot-quartz/wiki/spring-boot-quartz-quartz-sql
