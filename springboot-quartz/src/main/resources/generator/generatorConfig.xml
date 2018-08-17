@@ -11,7 +11,7 @@
 
         <!-- 数据库连接 -->
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://10.150.20.82:3306/loan?useUnicode=true&amp;characterEncoding=UTF8&amp;connectTimeout=5000&amp;socketTimeout=10000&amp;tinyInt1isBit=false"
+                        connectionURL="jdbc:mysql://localhost:3306/loan?useUnicode=true&amp;characterEncoding=UTF8&amp;connectTimeout=5000&amp;socketTimeout=10000&amp;tinyInt1isBit=false"
                         userId="root"
                         password="root">
         </jdbcConnection>
