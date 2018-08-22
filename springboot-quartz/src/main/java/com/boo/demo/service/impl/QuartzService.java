@@ -2,6 +2,8 @@ package com.boo.demo.service.impl;
 
 import com.boo.demo.config.quartz.BaseJob;
 import com.boo.demo.config.quartz.JobAdapter;
+import com.boo.demo.constants.JobStateConstant;
+import com.boo.demo.entity.TiggerDetail;
 import com.boo.demo.service.IQuartzService;
 import com.boo.demo.utils.SpringUtils;
 import org.quartz.*;
@@ -112,21 +114,27 @@ public class QuartzService implements IQuartzService {
     }
 
     @Override
-    public List<Map<String, Object>> getQuartzTrigger(String triggerGroup) throws SchedulerException {
+    public List<TiggerDetail> getQuartzTrigger(String triggerGroup) throws SchedulerException {
         GroupMatcher<TriggerKey> matcher = GroupMatcher.triggerGroupContains(triggerGroup);
         Set<TriggerKey> triggers = scheduler.getTriggerKeys(matcher);
-        List<Map<String, Object>> triggerList = new ArrayList<>();
 
+        List<TiggerDetail> triggerList = new ArrayList<>();
+        int i=1;
         for (TriggerKey key : triggers) {
             Trigger trigger = scheduler.getTrigger(key);
             String state = scheduler.getTriggerState(key).toString();
             String jobDescription = scheduler.getJobDetail(trigger.getJobKey()).getDescription();
 
-            Map<String, Object> map = new HashMap<>();
-            map.put("state", state);
-            map.put("JobDescription",jobDescription);
-            copyPropertys(trigger, map);
-            triggerList.add(map);
+            TiggerDetail tiggerDetail=new TiggerDetail();
+            tiggerDetail.setId(i++);
+            tiggerDetail.setState(state);
+            tiggerDetail.setCronExpression(((CronTriggerImpl) trigger).getCronExpression());
+            tiggerDetail.setJobDescription(jobDescription);
+            tiggerDetail.setNextFireTime(trigger.getNextFireTime());
+            tiggerDetail.setPreviousFireTime(trigger.getPreviousFireTime());
+            tiggerDetail.setStartTime(trigger.getStartTime());
+            tiggerDetail.setStateMessage(JobStateConstant.JOB_STATE_MAP.get(state));
+            triggerList.add(tiggerDetail);
         }
         return triggerList;
     }

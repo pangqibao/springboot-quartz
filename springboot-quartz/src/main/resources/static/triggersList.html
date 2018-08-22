@@ -3,17 +3,159 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>triggersList</title>
+    <title>jobDetailsList</title>
     <link href="https://cdn.bootcss.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap-select/2.0.0-beta1/css/bootstrap-select.min.css" rel="stylesheet">
+
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/popper.js/1.14.3/umd/popper.min.js"></script>
     <script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-select/2.0.0-beta1/js/bootstrap-select.min.js"></script>
     <script src="https://cdn.bootcss.com/bootstrap-table/1.12.1/locale/bootstrap-table-zh-CN.min.js"></script>
 </head>
 <body>
 <div>
-    triggersList <(￣ˇ￣)/
+    <h3>Triggers监控</h3>
+    <button class="btn btn-primary" onclick="loadJobList()" data-toggle="modal" data-target="#myModal"><i class="fa fa-plus "></i>添加Triggers监控</button>
+    <!-- 添加Triggers监控 -->
+    <form method="post" action="job/addQuartzTrigger" class="form-horizontal" role="form" id="myForm" onsubmit="return ">
+        <div class="modal fade" id="myModal"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <!--  定义模态框，过渡效果为淡入，id为myModal,tabindex=-1可以禁用使用tab切换，aria-labelledby用于引用模态框的标题，aria-hidden=true保持模态框在触发前窗口不可见  -->
+            <div class="modal-dialog">
+                <!--  显示模态框对话框模型（若不写下一个div则没有颜色）  -->
+                <div class="modal-content">
+                    <!--  显示模态框白色背景，所有内容都写在这个div里面  -->
+
+                    <div class="btn-info modal-header">
+                        <!--  模态框标题  -->
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <!--  关闭按钮  -->
+                        <h4>新增Trigger</h4>
+                        <!--  标题内容  -->
+                    </div>
+
+                    <div class="modal-body">
+                        <!--  模态框内容，我在此处添加一个表单 -->
+                        <div class="form-group">
+                            <label for="name" class="col-sm-4 control-label">job名称</label>
+                            <div class="col-sm-9">
+                                <select id="name" name="name" class="selectpicker show-tick" data-live-search="true" title="请选择">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cronExpression" class="col-sm-4 control-label">cron表达式</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="cronExpression" name="cronExpression" class="form-control well" placeholder="cron表达式"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="description" class="col-sm-4 control-label">Trigger描述</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="description" name="description" class="form-control well" placeholder="Trigger描述"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <!--  模态框底部样式，一般是提交或者确定按钮 -->
+                        <button type="submit" class="btn btn-info">确定</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    </div>
+
+                </div><!-- /.modal-content -->
+            </div>
+        </div> <!-- /.modal -->
+    </form>
+
+    <!--JobDetail列表 -->
+    <table id="table">
+    </table>
 </div>
+<script type="text/javascript">
+    $(function () {
+        $('#table').bootstrapTable({
+            url: 'job/getQuartzTrigger',
+            columns: [{
+                field: 'id',
+                title: '序号'
+            }, {
+                field: 'jobDescription',
+                title: 'job描述'
+            }, {
+                field: 'cronExpression',
+                title: 'cron表达式'
+            },{
+                field: 'description',
+                title: 'Trigger描述'
+            },{
+                field: 'nextFireTime',
+                title: '下次触发时间'
+            },{
+                field: 'previousFireTime',
+                title: '上次触发时间'
+            },{
+                field: 'startTime',
+                title: '开始时间'
+            },{
+                field: 'stateMessage',
+                title: '状态'
+            },{
+                field:'Button',
+                title:'操作',
+                formatter:addFunctionAlty
+            } ]
+        });
+    });
+
+    function addFunctionAlty(value,row,index) {
+        return ['' +
+        '<button id="edit" class="btn btn-primary" onclick="editTrigger(\''+row.name+'\',\''+row.group+'\',\''+row.cronExpression+'\',\''+row.description+'\')">修改</button>&nbsp;&nbsp;' +
+        '<button id="delete" class="btn btn-danger" onclick="deleteTrigger(\''+row.name+'\',\''+row.group+'\')" data-toggle="button">删除</button>'
+        ].join("");
+    }
+
+    function loadJobList() {
+        $.get(
+            "job/getQuartzJobs",
+            function (data) {
+                $.each(data,function (i) {
+                    $('#name.selectpicker').append("<option value="+data[i].name+">"+data[i].name+"</option>");
+                });
+                $('#name').selectpicker("refresh");
+            }
+        );
+    }
+
+    function editTrigger(name,group,cronExpression,description) {
+        $.get(
+            "job/jumpUpdateTrigger?name="+name+"&group="+group+"&cronExpression="+cronExpression+"&description="+description,
+            function (data) {
+                if ("000000"==data){
+                    alert("触发成功");
+                } else {
+                    alert("触发失败");
+                }
+            }
+        );
+    }
+
+    function deleteTrigger(name,group) {
+        if (confirm("确认删除？")) {
+            $.get(
+                "job/deleteTrigger?name="+name+"&group="+group,
+                function (data) {
+                    if ("000000"==data){
+                        alert("删除成功");
+                    } else {
+                        alert("删除失败");
+                    }
+                }
+            );
+        }
+    }
+</script>
 </body>
 </html>

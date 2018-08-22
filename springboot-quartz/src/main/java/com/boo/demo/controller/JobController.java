@@ -2,6 +2,7 @@ package com.boo.demo.controller;
 
 import com.boo.demo.constants.JobConstant;
 import com.boo.demo.entity.JobDetail;
+import com.boo.demo.entity.TiggerDetail;
 import com.boo.demo.service.IQuartzService;
 import org.quartz.SchedulerException;
 import org.quartz.impl.JobDetailImpl;
@@ -35,7 +36,7 @@ public class JobController {
     }
 
     @RequestMapping(value = "/getQuartzTrigger")
-    public List<Map<String,Object>> getQuartzTrigger() throws SchedulerException {
+    public List<TiggerDetail> getQuartzTrigger() throws SchedulerException {
         return quartzService.getQuartzTrigger(JobConstant.TRIGGER_GROUP);
     }
 
@@ -74,9 +75,9 @@ public class JobController {
 
     @RequestMapping(value = "/addQuartzTrigger")
     public String addQuartzTrigger(CronTriggerImpl cronTrigger) throws ParseException, SchedulerException {
-        cronTrigger.setJobName(cronTrigger.getName());
         cronTrigger.setGroup(JobConstant.TRIGGER_GROUP);
-        cronTrigger.setJobName(JobConstant.JOB_GROUP);
+        cronTrigger.setJobName(cronTrigger.getName());
+        cronTrigger.setJobGroup(JobConstant.JOB_GROUP);
         quartzService.addTrigger(cronTrigger);
         return SUCCESS;
     }

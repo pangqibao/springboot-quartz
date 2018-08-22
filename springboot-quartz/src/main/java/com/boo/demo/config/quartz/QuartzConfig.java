@@ -76,6 +76,7 @@ public class QuartzConfig {
         dataSource.setPoolPreparedStatements(true);
         dataSource.setMaxOpenPreparedStatements(20);
         dataSource.setFilters("stat");
+        dataSource.setDefaultAutoCommit(true);
         return dataSource;
     }
 }

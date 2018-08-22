@@ -2,6 +2,7 @@ package com.boo.demo.service;
 
 
 import com.boo.demo.entity.JobDetail;
+import com.boo.demo.entity.TiggerDetail;
 import org.quartz.SchedulerException;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.triggers.CronTriggerImpl;
@@ -71,7 +72,7 @@ public interface IQuartzService {
      * @param triggerGroup
      * @return
      */
-    List<Map<String,Object>> getQuartzTrigger(String triggerGroup) throws SchedulerException;
+    List<TiggerDetail> getQuartzTrigger(String triggerGroup) throws SchedulerException;
 
     /**
      * 立即触发
