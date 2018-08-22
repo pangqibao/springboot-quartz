@@ -1,9 +1,8 @@
 package com.boo.demo.mapper;
 
-import com.boo.demo.entity.JobAndTrigger;
-
 import java.util.List;
+import java.util.Map;
 
 public interface JobMapper {
-	List<JobAndTrigger> getJobAndTriggerDetails();
+	List<Map<String,Object>> getJobAndTriggerDetails();
 }

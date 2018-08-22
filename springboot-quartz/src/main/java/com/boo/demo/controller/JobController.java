@@ -1,17 +1,20 @@
 package com.boo.demo.controller;
 
-import com.boo.demo.entity.JobAndTrigger;
-import com.boo.demo.job.BaseJob;
-import com.boo.demo.service.IJobAndTriggerService;
-import com.github.pagehelper.PageInfo;
-import org.quartz.*;
+import com.boo.demo.constants.JobConstant;
+import com.boo.demo.entity.JobDetail;
+import com.boo.demo.service.IQuartzService;
+import org.quartz.SchedulerException;
+import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.triggers.CronTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
+import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 
 
@@ -20,159 +23,80 @@ import java.util.Map;
 public class JobController {
     private static Logger logger = LoggerFactory.getLogger(JobController.class);
 
+    private static final String SUCCESS="000000";
+
     @Autowired
-    private IJobAndTriggerService iJobAndTriggerService;
+    private IQuartzService quartzService;
 
-    /**
-     * 加入Qulifier注解，通过名称注入bean
-     */
-    @Autowired
-    @Qualifier("Scheduler")
-    private Scheduler scheduler;
-
-
-    /**
-     * 创建任务
-     * @param jobClassName
-     * @param jobGroupName
-     * @param cronExpression
-     * @throws Exception
-     */
-    @PostMapping(value = "/addjob")
-    public void addjob(@RequestParam(value = "jobClassName") String jobClassName,
-                       @RequestParam(value = "jobGroupName") String jobGroupName,
-                       @RequestParam(value = "cronExpression") String cronExpression) throws Exception {
-        addJob(jobClassName, jobGroupName, cronExpression);
+    @RequestMapping(value = "/getQuartzJobs")
+    public List<JobDetail> getQuartzJobs() throws SchedulerException {
+        List<JobDetail> jobDetails= quartzService.getQuartzJobs(JobConstant.JOB_GROUP);
+        return jobDetails;
     }
 
-    private void addJob(String jobClassName, String jobGroupName, String cronExpression) throws Exception {
-
-        // 启动调度器  
-        scheduler.start();
-
-        //构建job信息
-        JobDetail jobDetail = JobBuilder.newJob(getClass(jobClassName).getClass()).withIdentity(jobClassName, jobGroupName).build();
-
-        //表达式调度构建器(即任务执行的时间)
-        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
-
-        //按新的cronExpression表达式构建一个新的trigger
-        CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobClassName, jobGroupName)
-                .withSchedule(scheduleBuilder).build();
-
-        try {
-            scheduler.scheduleJob(jobDetail, trigger);
-
-        } catch (SchedulerException e) {
-            System.out.println("创建定时任务失败" + e);
-            throw new Exception("创建定时任务失败");
-        }
+    @RequestMapping(value = "/getQuartzTrigger")
+    public List<Map<String,Object>> getQuartzTrigger() throws SchedulerException {
+        return quartzService.getQuartzTrigger(JobConstant.TRIGGER_GROUP);
     }
 
-
-    /**
-     * 暂停任务
-     * @param jobClassName
-     * @param jobGroupName
-     * @throws Exception
-     */
-    @PostMapping(value = "/pausejob")
-    public void pausejob(@RequestParam(value = "jobClassName") String jobClassName, @RequestParam(value = "jobGroupName") String jobGroupName) throws Exception {
-        jobPause(jobClassName, jobGroupName);
+    @RequestMapping(value = "/deleteTrigger")
+    public String deleteTrigger(CronTriggerImpl cronTrigger) throws SchedulerException {
+        quartzService.deleteTrigger(cronTrigger);
+        return SUCCESS;
     }
 
-    private void jobPause(String jobClassName, String jobGroupName) throws Exception {
-        scheduler.pauseJob(JobKey.jobKey(jobClassName, jobGroupName));
+    @RequestMapping(value = "/deleteJobs")
+    public String deleteJob(JobDetailImpl jobDetail) throws SchedulerException {
+        quartzService.deleteJob(jobDetail);
+        return SUCCESS;
     }
 
-
-    /**
-     * 恢复任务
-     * @param jobClassName
-     * @param jobGroupName
-     * @throws Exception
-     */
-    @PostMapping(value = "/resumejob")
-    public void resumejob(@RequestParam(value = "jobClassName") String jobClassName, @RequestParam(value = "jobGroupName") String jobGroupName) throws Exception {
-        jobresume(jobClassName, jobGroupName);
+    @RequestMapping(value = "/rescheduleJob")
+    public String rescheduleJob(JobDetailImpl jobDetail){
+        quartzService.execJob(jobDetail);
+        return SUCCESS;
     }
 
-    private void jobresume(String jobClassName, String jobGroupName) throws Exception {
-        scheduler.resumeJob(JobKey.jobKey(jobClassName, jobGroupName));
+    @RequestMapping(value = "addQuartzJobs")
+    public String addQuartzJobs(JobDetail jobDetail) throws SchedulerException {
+        jobDetail.setGroup(JobConstant.JOB_GROUP);
+        jobDetail.setName(StringUtils.uncapitalize(jobDetail.getName()));
+        quartzService.addJob(jobDetail);
+        return SUCCESS;
     }
 
-
-    /**
-     * 重启任务
-     * @param jobClassName
-     * @param jobGroupName
-     * @param cronExpression
-     * @throws Exception
-     */
-    @PostMapping(value = "/reschedulejob")
-    public void rescheduleJob(@RequestParam(value = "jobClassName") String jobClassName,
-                              @RequestParam(value = "jobGroupName") String jobGroupName,
-                              @RequestParam(value = "cronExpression") String cronExpression) throws Exception {
-        jobreschedule(jobClassName, jobGroupName, cronExpression);
+    @RequestMapping(value = "/addQuartzJobCheck")
+    public String addQuartzJobCheck(String jobName) throws ClassNotFoundException {
+        String className=JobConstant.BATCH_PACKAGE+StringUtils.uncapitalize(jobName);
+        Class.forName(className);
+        return SUCCESS;
     }
 
-    private void jobreschedule(String jobClassName, String jobGroupName, String cronExpression) throws Exception {
-        try {
-            TriggerKey triggerKey = TriggerKey.triggerKey(jobClassName, jobGroupName);
-            // 表达式调度构建器
-            CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
-
-            CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
-
-            // 按新的cronExpression表达式重新构建trigger
-            trigger = trigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
-
-            // 按新的trigger重新设置job执行
-            scheduler.rescheduleJob(triggerKey, trigger);
-        } catch (SchedulerException e) {
-            System.out.println("更新定时任务失败" + e);
-            throw new Exception("更新定时任务失败");
-        }
+    @RequestMapping(value = "/addQuartzTrigger")
+    public String addQuartzTrigger(CronTriggerImpl cronTrigger) throws ParseException, SchedulerException {
+        cronTrigger.setJobName(cronTrigger.getName());
+        cronTrigger.setGroup(JobConstant.TRIGGER_GROUP);
+        cronTrigger.setJobName(JobConstant.JOB_GROUP);
+        quartzService.addTrigger(cronTrigger);
+        return SUCCESS;
     }
 
-
-    /**
-     * 删除任务
-     * @param jobClassName
-     * @param jobGroupName
-     * @throws Exception
-     */
-    @PostMapping(value = "/deletejob")
-    public void deletejob(@RequestParam(value = "jobClassName") String jobClassName, @RequestParam(value = "jobGroupName") String jobGroupName) throws Exception {
-        jobdelete(jobClassName, jobGroupName);
+    @RequestMapping(value = "/updateQuartzTrigger")
+    public String updateQuartzTrigger(CronTriggerImpl cronTrigger) throws SchedulerException {
+        quartzService.updateTrigger(cronTrigger);
+        return SUCCESS;
     }
 
-    private void jobdelete(String jobClassName, String jobGroupName) throws Exception {
-        scheduler.pauseTrigger(TriggerKey.triggerKey(jobClassName, jobGroupName));
-        scheduler.unscheduleJob(TriggerKey.triggerKey(jobClassName, jobGroupName));
-        scheduler.deleteJob(JobKey.jobKey(jobClassName, jobGroupName));
+    @RequestMapping(value = "/stopTrigger")
+    public String stopTrigger(CronTriggerImpl cronTrigger) throws SchedulerException {
+        quartzService.pauseTrigger(cronTrigger);
+        return SUCCESS;
     }
 
-
-    /**
-     * 查询任务列表
-     * @param pageNum
-     * @param pageSize
-     * @return
-     */
-    @GetMapping(value = "/queryjob")
-    public Map<String, Object> queryjob(@RequestParam(value = "pageNum") Integer pageNum, @RequestParam(value = "pageSize") Integer pageSize) {
-        PageInfo<JobAndTrigger> jobAndTrigger = iJobAndTriggerService.getJobAndTriggerDetails(pageNum, pageSize);
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("JobAndTrigger", jobAndTrigger);
-        map.put("number", jobAndTrigger.getTotal());
-        return map;
+    @RequestMapping(value = "/startTrigger")
+    public String startTrigger(CronTriggerImpl cronTrigger) throws SchedulerException {
+        quartzService.resumeTrigger(cronTrigger);
+        return SUCCESS;
     }
-
-    private static BaseJob getClass(String classname) throws Exception {
-        Class<?> class1 = Class.forName(classname);
-        return (BaseJob) class1.newInstance();
-    }
-
 
 }

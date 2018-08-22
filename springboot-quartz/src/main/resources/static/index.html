@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">   
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="Author" content="Dreamer-1.">
+		
+		<!-- 引入各种CSS样式表 -->
+		<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+		<link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="css/index.css">
+
+		<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
+		<title>- springboot-quartz -</title>
+	</head>
+	
+	<body>
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+      		<div class="container">
+        		<div class="navbar-header">
+	          		<a class="navbar-brand" href="index.html">springboot-quartz.com</a>
+        		</div>
+      		</div>
+    	</nav>
+
+	<!-- 左侧菜单选项========================================= -->
+		<div class="container-fluid">
+			<div class="row-fluie">
+				<div class="col-sm-3 col-md-2 sidebar">		
+					<ul class="nav nav-sidebar">
+						<!-- 一级菜单 -->
+						<li class="active"><a href="#userMeun" class="nav-header menu-first collapsed" data-toggle="collapse">
+							<i class="fa fa-cogs"></i>&nbsp; JOB配置信息 <span class="sr-only">(current)</span></a>
+						</li> 
+						<!-- 二级菜单 -->
+						<!-- 注意一级菜单中<a>标签内的href="#……"里面的内容要与二级菜单中<ul>标签内的id="……"里面的内容一致 -->
+						<ul id="userMeun" class="nav nav-list collapse menu-second">
+							<li><a href="###" onclick="showAtRight('jobDetailsList.html')"><i class="fa fa-cog"></i> JobDetails监控</a></li>
+							<li><a href="###" onclick="showAtRight('triggersList.html')"><i class="fa fa-cog"></i> Triggers监控</a></li>
+						</ul>
+
+					</ul>
+					
+				</div>
+			</div>
+		</div>
+
+<!-- 右侧内容展示==================================================   -->   		
+ 				<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id="main">
+					<h1 class="page-header"><i class="fa fa-cog fa-spin"></i>&nbsp;控制台:<small>&nbsp;&nbsp;&nbsp;欢迎使用JOB信息管理系统</small></h1>
+
+          				<div id="content">
+          	 
+       						<h4>    				
+   								<strong>使用指南：</strong><br/>
+       						</h4>
+							<br/><br/>jobDetailsList：管理添加定时任务<br/>
+							<br/><br/>triggersList：定时任务时间设置<br/>
+          				</div>  
+						<i class="fa fa-plus "></i>&nbsp;添加
+						<i class="fa fa-minus "></i>&nbsp;删除
+				</div> 
+		
+		
+		<script type="text/javascript">
+		
+		/*
+		 * 对选中的标签激活active状态，对先前处于active状态但之后未被选中的标签取消active
+		 * （实现左侧菜单中的标签点击后变色的效果）
+		 */
+		$(document).ready(function () {
+			$('ul.nav > li').click(function (e) {
+				//e.preventDefault();	加上这句则导航的<a>标签会失效
+				$('ul.nav > li').removeClass('active');
+				$(this).addClass('active');
+			});
+		});
+		
+		
+		function showAtRight(url){
+			$("#main").html('<object type="text/html" data='+url+' width="100%" height="600px"></object>');
+		}
+		</script>
+	
+	</body>
+</html>

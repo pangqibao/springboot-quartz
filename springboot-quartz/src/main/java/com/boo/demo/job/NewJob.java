@@ -1,20 +1,19 @@
 package com.boo.demo.job;
 
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import com.boo.demo.config.quartz.BaseJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-public class NewJob implements BaseJob {  
+@Component("newJob")
+public class NewJob extends BaseJob {
   
-    private static Logger _log = LoggerFactory.getLogger(NewJob.class);
-     
+    private static Logger logger = LoggerFactory.getLogger(NewJob.class);
+
     @Override
-    public void execute(JobExecutionContext context)
-        throws JobExecutionException {  
-        _log.error("New Job执行时间: " + new Date());  
-          
-    }  
-}  
+    public void dowork() {
+        logger.error("New Job执行时间: " + LocalDateTime.now());
+    }
+}
