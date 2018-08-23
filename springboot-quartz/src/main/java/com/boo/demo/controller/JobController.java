@@ -84,6 +84,8 @@ public class JobController {
 
     @RequestMapping(value = "/updateQuartzTrigger")
     public String updateQuartzTrigger(CronTriggerImpl cronTrigger) throws SchedulerException {
+        cronTrigger.setGroup(JobConstant.TRIGGER_GROUP);
+        cronTrigger.setJobGroup(JobConstant.JOB_GROUP);
         quartzService.updateTrigger(cronTrigger);
         return SUCCESS;
     }

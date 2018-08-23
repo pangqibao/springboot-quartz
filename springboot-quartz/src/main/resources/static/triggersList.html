@@ -18,10 +18,14 @@
 <body>
 <div>
     <h3>Triggers监控</h3>
-    <button class="btn btn-primary" onclick="loadJobList()" data-toggle="modal" data-target="#myModal"><i class="fa fa-plus "></i>添加Triggers监控</button>
+    <button class="btn btn-primary" onclick="loadJobList()" data-toggle="modal" data-target="#myModal"><i
+            class="fa fa-plus "></i>添加Triggers监控
+    </button>
     <!-- 添加Triggers监控 -->
-    <form method="post" action="job/addQuartzTrigger" class="form-horizontal" role="form" id="myForm" onsubmit="return ">
-        <div class="modal fade" id="myModal"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <form method="post" action="job/addQuartzTrigger" class="form-horizontal" role="form" id="myForm"
+          onsubmit="return ">
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true">
             <!--  定义模态框，过渡效果为淡入，id为myModal,tabindex=-1可以禁用使用tab切换，aria-labelledby用于引用模态框的标题，aria-hidden=true保持模态框在触发前窗口不可见  -->
             <div class="modal-dialog">
                 <!--  显示模态框对话框模型（若不写下一个div则没有颜色）  -->
@@ -41,20 +45,23 @@
                         <div class="form-group">
                             <label for="name" class="col-sm-4 control-label">job名称</label>
                             <div class="col-sm-9">
-                                <select id="name" name="name" class="selectpicker show-tick" data-live-search="true" title="请选择">
+                                <select id="name" name="name" class="selectpicker show-tick" data-live-search="true"
+                                        title="请选择">
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="cronExpression" class="col-sm-4 control-label">cron表达式</label>
                             <div class="col-sm-9">
-                                <input type="text" id="cronExpression" name="cronExpression" class="form-control well" placeholder="cron表达式"/>
+                                <input type="text" id="cronExpression" name="cronExpression" class="form-control well"
+                                       placeholder="cron表达式"/>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="description" class="col-sm-4 control-label">Trigger描述</label>
                             <div class="col-sm-9">
-                                <input type="text" id="description" name="description" class="form-control well" placeholder="Trigger描述"/>
+                                <input type="text" id="description" name="description" class="form-control well"
+                                       placeholder="Trigger描述"/>
                             </div>
                         </div>
                     </div>
@@ -87,33 +94,45 @@
             }, {
                 field: 'cronExpression',
                 title: 'cron表达式'
-            },{
+            }, {
                 field: 'description',
                 title: 'Trigger描述'
-            },{
+            }, {
                 field: 'nextFireTime',
                 title: '下次触发时间'
-            },{
+            }, {
                 field: 'previousFireTime',
                 title: '上次触发时间'
-            },{
+            }, {
                 field: 'startTime',
                 title: '开始时间'
-            },{
+            }, {
                 field: 'stateMessage',
                 title: '状态'
-            },{
-                field:'Button',
-                title:'操作',
-                formatter:addFunctionAlty
-            } ]
+            }, {
+                field: 'Button',
+                title: '操作',
+                formatter: addFunctionAlty
+            }]
         });
     });
 
-    function addFunctionAlty(value,row) {
-        return ['' +
-        '<button id="edit" class="btn btn-primary" onclick="editTrigger(\''+row.name+'\',\''+row.group+'\',\''+row.cronExpression+'\',\''+row.description+'\')">修改</button>&nbsp;&nbsp;' +
-        '<button id="delete" class="btn btn-danger" onclick="deleteTrigger(\''+row.name+'\',\''+row.group+'\')" data-toggle="button">删除</button>'
+    function addFunctionAlty(value, row) {
+        var caoz;
+        if (row.state == "NORMAL") {
+            caoz = '<button class="btn btn-danger" onclick="modifyTrigger(\'job/stopTrigger\',\'' + row.name + '\',\'' + row.group + '\')" data-toggle="button">暂停</button>' & nbsp;
+        &
+            nbsp;
+            ' +;
+        } else if (row.state == "PAUSED") {
+            caoz = '<button class="btn btn-danger" onclick="modifyTrigger(\'job/startTrigger\',\'' + row.name + '\',\'' + row.group + '\')" data-toggle="button">触发</button>' & nbsp;
+        &
+            nbsp;
+            ' +;
+        }
+        return ['' + caoz +
+        '<button id="edit" class="btn btn-primary" onclick="editTrigger(\'' + row.name + '\',\'' + row.group + '\',\'' + row.cronExpression + '\',\'' + row.description + '\')">修改</button>&nbsp;&nbsp;' +
+        '<button id="delete" class="btn btn-danger" onclick="if(confirm(\'确认删除？\')){modifyTrigger(\'job/deleteTrigger\',\'' + row.name + '\',\'' + row.group + '\');}else{return false;}" data-toggle="button">删除</button>'
         ].join("");
     }
 
@@ -121,19 +140,25 @@
         $.get(
             "job/getQuartzJobs",
             function (data) {
-                $.each(data,function (i) {
-                    $('#name.selectpicker').append("<option value="+data[i].name+">"+data[i].name+"</option>");
+                $.each(data, function (i) {
+                    $('#name.selectpicker').append("<option value=" + data[i].name + ">" + data[i].name + "</option>");
                 });
                 $('#name').selectpicker("refresh");
             }
         );
     }
+    
+    function setDefault(name, group, cronExpression, description) {
+        loadJobList();
+        $("#cronExpression").val(cronExpression);
+        $("#group")
+    }
 
-    function editTrigger(name,group,cronExpression,description) {
+    function editTrigger(name, group, cronExpression, description) {
         $.get(
-            "job/jumpUpdateTrigger?name="+name+"&group="+group+"&cronExpression="+cronExpression+"&description="+description,
+            "job/jumpUpdateTrigger?name=" + name + "&group=" + group + "&cronExpression=" + cronExpression + "&description=" + description,
             function (data) {
-                if ("000000"==data){
+                if ("000000" == data) {
                     alert("触发成功");
                 } else {
                     alert("触发失败");
@@ -142,19 +167,17 @@
         );
     }
 
-    function deleteTrigger(name,group) {
-        if (confirm("确认删除？")) {
-            $.get(
-                "job/deleteTrigger?name="+name+"&group="+group,
-                function (data) {
-                    if ("000000"==data){
-                        alert("删除成功");
-                    } else {
-                        alert("删除失败");
-                    }
+    function modifyTrigger(url, name, group) {
+        $.get(
+            url + "?name=" + name + "&group=" + group,
+            function (data) {
+                if ("000000" == data) {
+                    alert("成功");
+                } else {
+                    alert("失败");
                 }
-            );
-        }
+            }
+        );
     }
 </script>
 </body>
