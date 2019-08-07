@@ -1,8 +1,8 @@
-package com.boo.demo.config.quartz;
+package com.boo.quartz.config.quartz;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.boo.demo.constants.JobConstant;
-import com.boo.demo.utils.SpringUtils;
+import com.boo.quartz.constants.JobConst;
+import com.boo.quartz.util.ApplicationUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,9 +11,15 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * @ClassName QuartzConfig
+ * @Description quartz 默认配置文件
+ * @Author boo
+ * @Date 2019/8/7 9:30
+ * @Version 1.0.0
+ */
 @Configuration
 public class QuartzConfig {
-
     @Value("${job.mysql.url}")
     private String url;
 
@@ -26,10 +32,10 @@ public class QuartzConfig {
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws SQLException {
         SchedulerFactoryBean schedulerFactoryBean=new SchedulerFactoryBean();
-        schedulerFactoryBean.setSchedulerName(JobConstant.SCHEDULER);
+        schedulerFactoryBean.setSchedulerName(JobConst.SCHEDULER);
         schedulerFactoryBean.setDataSource(getDruidDataSource());
         schedulerFactoryBean.setApplicationContextSchedulerContextKey("applicationContextKey");
-        schedulerFactoryBean.setApplicationContext(SpringUtils.getApplicationContext());
+        schedulerFactoryBean.setApplicationContext(ApplicationUtil.getApplicationContext());
         schedulerFactoryBean.setAutoStartup(true);
         schedulerFactoryBean.setStartupDelay(15);
         schedulerFactoryBean.setQuartzProperties(getProperties());
@@ -38,7 +44,7 @@ public class QuartzConfig {
 
     private Properties getProperties() {
         Properties properties = new Properties();
-        properties.put("org.quartz.scheduler.instanceName", JobConstant.SCHEDULER);
+        properties.put("org.quartz.scheduler.instanceName", JobConst.SCHEDULER);
         properties.put("org.quartz.scheduler.instanceId", "AUTO");
         properties.put("org.quartz.scheduler.skipUpdateCheck", "true");
         properties.put("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");

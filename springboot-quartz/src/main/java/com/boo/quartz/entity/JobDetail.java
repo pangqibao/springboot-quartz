@@ -1,12 +1,28 @@
-package com.boo.demo.entity;
+package com.boo.quartz.entity;
 
 /**
- * 任务详情
+ * @ClassName JobDetail
+ * @Description 任务详情实体
+ * @Author boo
+ * @Date 2019/8/7 9:57
+ * @Version 1.0.0
  */
 public class JobDetail {
+    /**
+     * id
+     */
     private Integer id;
+    /**
+     * 任务名称
+     */
     private String name;
+    /**
+     * 任务分组
+     */
     private String group;
+    /**
+     * 任务描述
+     */
     private String description;
 
     public Integer getId() {

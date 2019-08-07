@@ -120,17 +120,11 @@
     function addFunctionAlty(value, row) {
         var caoz;
         if (row.state == "NORMAL") {
-            caoz = '<button class="btn btn-danger" onclick="modifyTrigger(\'job/stopTrigger\',\'' + row.name + '\',\'' + row.group + '\')" data-toggle="button">暂停</button>' & nbsp;
-        &
-            nbsp;
-            ' +;
+            caoz = '<button class="btn btn-danger" onclick="modifyTrigger(\'job/stopTrigger\',\'' + row.name + '\',\'' + row.group + '\')" data-toggle="button">暂停</button>&nbsp;&nbsp;' ;
         } else if (row.state == "PAUSED") {
-            caoz = '<button class="btn btn-danger" onclick="modifyTrigger(\'job/startTrigger\',\'' + row.name + '\',\'' + row.group + '\')" data-toggle="button">触发</button>' & nbsp;
-        &
-            nbsp;
-            ' +;
+            caoz = '<button class="btn btn-danger" onclick="modifyTrigger(\'job/startTrigger\',\'' + row.name + '\',\'' + row.group + '\')" data-toggle="button">触发</button>&nbsp;&nbsp;';
         }
-        return ['' + caoz +
+        return [caoz +
         '<button id="edit" class="btn btn-primary" onclick="editTrigger(\'' + row.name + '\',\'' + row.group + '\',\'' + row.cronExpression + '\',\'' + row.description + '\')">修改</button>&nbsp;&nbsp;' +
         '<button id="delete" class="btn btn-danger" onclick="if(confirm(\'确认删除？\')){modifyTrigger(\'job/deleteTrigger\',\'' + row.name + '\',\'' + row.group + '\');}else{return false;}" data-toggle="button">删除</button>'
         ].join("");

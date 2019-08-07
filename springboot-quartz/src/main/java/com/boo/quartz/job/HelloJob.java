@@ -1,19 +1,23 @@
-package com.boo.demo.job;
+package com.boo.quartz.job;
 
-import com.boo.demo.config.quartz.BaseJob;
+import com.boo.quartz.config.quartz.BaseJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
+/**
+ * @ClassName HelloJob
+ * @Description 测试任务
+ * @Author boo
+ * @Date 2019/8/7 10:48
+ * @Version 1.0.0
+ */
 @Component("helloJob")
 public class HelloJob extends BaseJob {
-  
     private static Logger logger = LoggerFactory.getLogger(HelloJob.class);
 
     @Override
     public void dowork() {
-        logger.error("Hello Job执行时间: " + LocalDateTime.now());
+        logger.info("hello job 测试定时任务执行......");
     }
 }

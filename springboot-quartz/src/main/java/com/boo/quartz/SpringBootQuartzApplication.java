@@ -1,14 +1,13 @@
-package com.boo.demo;
+package com.boo.quartz;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@MapperScan("com.boo.demo.mapper")
 @SpringBootApplication
-public class DemoApplication {
+public class SpringBootQuartzApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DemoApplication.class, args);
+        SpringApplication.run(SpringBootQuartzApplication.class, args);
     }
+
 }
