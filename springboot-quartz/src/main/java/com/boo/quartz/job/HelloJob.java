@@ -1,6 +1,7 @@
 package com.boo.quartz.job;
 
 import com.boo.quartz.config.quartz.BaseJob;
+import org.quartz.JobDataMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ public class HelloJob extends BaseJob {
     private static Logger logger = LoggerFactory.getLogger(HelloJob.class);
 
     @Override
-    public void dowork() {
-        logger.info("hello job 测试定时任务执行......");
+    public void dowork(JobDataMap dataMap) {
+        logger.info(dataMap.getString("serviceName") + "测试定时任务执行......");
     }
 }

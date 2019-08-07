@@ -155,7 +155,8 @@ public class QuartzServiceImpl implements IQuartzService {
     @Override
     public void execJob(JobDetailImpl jobDetail) {
         logger.info("execJob start jobName={}", jobDetail.getName());
-        BaseJob job = ApplicationUtil.getBean(jobDetail.getName());
-        job.execute();
+        String[] jobNames = jobDetail.getName().split("-");
+        BaseJob job = ApplicationUtil.getBean(jobNames[0]);
+        job.execute(jobDetail.getJobDataMap());
     }
 }

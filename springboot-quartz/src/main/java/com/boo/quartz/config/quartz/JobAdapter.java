@@ -18,7 +18,8 @@ public class JobAdapter implements Job {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap dataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         String serviceName = dataMap.getString("serviceName");
-        BaseJob service = ApplicationUtil.getBean(serviceName);
-        service.execute();
+        String[] serviceNames = serviceName.split("-");
+        BaseJob service = ApplicationUtil.getBean(serviceNames[0]);
+        service.execute(dataMap);
     }
 }

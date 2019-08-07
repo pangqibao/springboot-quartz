@@ -1,5 +1,6 @@
 package com.boo.quartz.config.quartz;
 
+import org.quartz.JobDataMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ public abstract class BaseJob {
 
     private final byte[] lock = new byte[0];
 
-    public void execute() {
+    public void execute(JobDataMap dataMap) {
         // 单机用这个,多机用redis分布式
         synchronized (lock) {
             if (running) {
@@ -33,7 +34,7 @@ public abstract class BaseJob {
         LocalDateTime start = LocalDateTime.now();
         try {
             logger.info("[{}] start, time={}", getDesc(), start);
-            dowork();
+            dowork(dataMap);
             logger.info("[{}] end, 耗时={} 秒", getDesc(), LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"))-start.toEpochSecond(ZoneOffset.of("+8")));
         } catch (Exception e) {
             logger.error("[{}] error during dowork exception={} ", getDesc(), e);
@@ -41,7 +42,7 @@ public abstract class BaseJob {
         running = false;
     }
 
-    public abstract void dowork();
+    public abstract void dowork(JobDataMap dataMap);
 
     public String getDesc() {
         return this.getClass().getSimpleName();
